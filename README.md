@@ -9,5 +9,5 @@
 
 ## Usage
 1. Run `python webnovel_to_Audio.py`  
-2. If you get a memory error run the command with `--split 2` increase the number until you dont get a error anymore
+2. If you get a memory error run the command with `--number_of_files_splits 4` increase the number until you dont get a error anymore
 3. the files will be in the `output/` folder
