@@ -92,14 +92,16 @@ for i in range(0, numberOfFiles):
     
 
 # Get all audio files and combine to one
-onlyfiles = [f for f in os.listdir(audioExportFolder) if os.path.isfile(os.path.join(audioExportFolder, f))]
+onlyfiles = [f for f in os.listdir("output/audio/") if os.path.isfile(os.path.join("output/audio/", f))]
 onlyfiles = sorted(onlyfiles)
 print("Number of audio files to be added: " + str(len(onlyfiles)))
 
 completeAudio = AudioSegment.empty()
 for i in range(0, len(onlyfiles)):
+    print("------------------------------------------------------------------")
     print("Audio file name: " + onlyfiles[i])
-    completeAudio += AudioSegment.from_file(audioExportFolder + onlyfiles[i], format="wav");
+    print("------------------------------------------------------------------")
+    completeAudio += AudioSegment.from_file("output/audio/" + onlyfiles[i], format="wav");
     
 completeAudio.export("output/combinedAudio.mp3", format="mp3")
 
