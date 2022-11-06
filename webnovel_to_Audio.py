@@ -62,11 +62,17 @@ with open(fileToOpen + ".txt", "r", encoding='utf-8') as file:
     data = data.replace("...", " ")
     data = data.replace(u"\u2018", "'").replace(u"\u2019", "'")
 
+
 # split the file in multiple smaller files
 sentencesList = data.split(".")
-# add back the "."
+
+# remove empty entries
+sentencesList = list(filter(None, sentencesList))
+
+# add back the ".", only when it doesnt alreday have a "."
 for i in range(0, len(sentencesList)):
-    sentencesList[i] = sentencesList[i] + "." 
+    if (sentencesList[i][-1] != "."):
+        sentencesList[i] = sentencesList[i] + "." 
 
 numberOfSentences = len(sentencesList)
 
@@ -83,7 +89,9 @@ for i in range(0, numberOfFiles):
 # creates the audio files
 for i in range(0, numberOfFiles):
     filename = "inference_text"+ str(i) +"_edited.txt"
+    print("------------------------------------------------------------------")
     print("Current File: " + filename)
+    print("------------------------------------------------------------------")
     os.system("CUDA_VISIBLE_DEVICES=0 PYTHONPATH=. python tasks/priorgrad_inference.py --config configs/tts/lj/priorgrad.yaml --exp_name priorgrad --reset --inference_text " + "output/" + filename + " --fast --fast_iter " + str(numberIteration))
     
     # rename the file so that we thats it sortet
@@ -98,9 +106,7 @@ print("Number of audio files to be added: " + str(len(onlyfiles)))
 
 completeAudio = AudioSegment.empty()
 for i in range(0, len(onlyfiles)):
-    print("------------------------------------------------------------------")
     print("Audio file name: " + onlyfiles[i])
-    print("------------------------------------------------------------------")
     completeAudio += AudioSegment.from_file("output/audio/" + onlyfiles[i], format="wav");
     
 completeAudio.export("output/combinedAudio.mp3", format="mp3")
