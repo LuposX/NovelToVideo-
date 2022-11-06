@@ -69,7 +69,7 @@ with open(fileToOpen + ".txt", "r", encoding='utf-8') as file:
 sentencesListSplit = data.split(".")
 
 # remove empty entries
-sentencesList = [x for x in sentencesListSplit if (x != None) and (x != "\"") and (x != ".") and not (re.match(r"^\s+[.]\s+$", x)) and (x != "") and not (re.match(r"^\s+$", x)) and not (re.match(r"^\s+[.\"]$", x))]
+sentencesList = [x for x in sentencesListSplit if (x != None) and (x != "\"") and (x != ".") and not (re.match(r"^\s+[.]\s+$", x)) and (x != "") and not (re.match(r"^\s+$", x)) and not (re.match(r"^\s+[.\"]$", x)) and not (x in "If you want to read more chapters") and not (x in "to experience faster update speed")]
 
 # add back the ".", only when it doesnt alreday have a "."
 for i in range(0, len(sentencesList)):
@@ -104,10 +104,14 @@ for i in range(0, numberOfFiles):
     singleAudioFile = [f for f in os.listdir(audioExportFolder) if os.path.isfile(os.path.join(audioExportFolder, f))]
     os.rename(audioExportFolder + singleAudioFile[0], "output/audio/part" + str(i) + ".mp3")
     
+# function whichis used for sorting
+def num_sort(test_string):
+    return list(map(int, re.findall(r'\d+', test_string)))[0]
+
 
 # Get all audio files and combine to one
 onlyfiles = [f for f in os.listdir("output/audio/") if os.path.isfile(os.path.join("output/audio/", f))]
-onlyfiles = sorted(onlyfiles)
+onlyfiles = sorted(onlyfiles, key=num_sort)
 print("Number of audio files to be added: " + str(len(onlyfiles)))
 
 completeAudio = AudioSegment.empty()
