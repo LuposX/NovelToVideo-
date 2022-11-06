@@ -39,6 +39,13 @@ try:
 except FileExistsError:
     # directory already exists
     pass
+    
+try:
+    os.makedirs("output/audio")
+except FileExistsError:
+    # directory already exists
+    pass
+
 
 # remove old path
 try:
@@ -78,13 +85,20 @@ for i in range(0, numberOfFiles):
     filename = "inference_text"+ str(i) +"_edited.txt"
     print("Current File: " + filename)
     os.system("CUDA_VISIBLE_DEVICES=0 PYTHONPATH=. python tasks/priorgrad_inference.py --config configs/tts/lj/priorgrad.yaml --exp_name priorgrad --reset --inference_text " + "output/" + filename + " --fast --fast_iter " + str(numberIteration))
+    
+    # rename the file so that we thats it sortet
+    singleAudioFile = [f for f in os.listdir(audioExportFolder) if os.path.isfile(os.path.join(audioExportFolder, f))]
+    os.rename(audioExportFolder + singleAudioFile[0], "output/audio/part" + str(i) + ".mp3")
+    
 
 # Get all audio files and combine to one
 onlyfiles = [f for f in os.listdir(audioExportFolder) if os.path.isfile(os.path.join(audioExportFolder, f))]
+onlyfiles = sorted(onlyfiles)
 print("Number of audio files to be added: " + str(len(onlyfiles)))
 
 completeAudio = AudioSegment.empty()
 for i in range(0, len(onlyfiles)):
+    print("Audio file name: " + onlyfiles[i])
     completeAudio += AudioSegment.from_file(audioExportFolder + onlyfiles[i], format="wav");
     
 completeAudio.export("output/combinedAudio.mp3", format="mp3")
