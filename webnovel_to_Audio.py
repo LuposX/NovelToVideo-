@@ -2,6 +2,7 @@ import os
 from pydub import AudioSegment
 import subprocess
 import argparse
+import re
 
 # Instantiate the parser
 parser = argparse.ArgumentParser(description='This, transform a text into a mp4 file, which consists of an image and the spoken text.')
@@ -57,21 +58,26 @@ except OSError as e:
 with open(fileToOpen + ".txt", "r", encoding='utf-8') as file:
     data = file.read().rstrip()
     data = data.replace("\n", " ")
-    data = data.replace("\"", "")
-    data = data.replace("\'", "")
-    data = data.replace("...", " ")
     data = data.replace(u"\u2018", "'").replace(u"\u2019", "'")
+    data = data.replace(u"\u2026", "...")
+    data = data.encode("ascii","ignore")
+    data = data.decode()
+
 
 
 # split the file in multiple smaller files
-sentencesList = data.split(".")
+sentencesListSplit = data.split(".")
 
 # remove empty entries
-sentencesList = list(filter(None, sentencesList))
+sentencesList = [x for x in sentencesListSplit if (x != None) and (x != "\"") and (x != ".") and not (re.match(r"^\s+[.]\s+$", x)) and (x != "") and not (re.match(r"^\s+$", x)) and not (re.match(r"^\s+[.\"]$", x))]
 
 # add back the ".", only when it doesnt alreday have a "."
 for i in range(0, len(sentencesList)):
-    if (sentencesList[i][-1] != "."):
+    if (sentencesList[i][-1] == "'" or sentencesList[i][-1] == "\"" ):
+        pass
+    elif (sentencesList[i][-1] == "." or sentencesList[i][-1] == "!" or sentencesList[i][-1] == "?"):
+        pass
+    else:
         sentencesList[i] = sentencesList[i] + "." 
 
 numberOfSentences = len(sentencesList)
@@ -80,7 +86,7 @@ numberSentencesPerFile = round(numberOfSentences / numberOfFiles)
 
 for i in range(0, numberOfFiles):
     with open("output/"+ fileToOpen + str(i) + "_edited.txt", "w", encoding='utf-8') as file:
-        if (numberSentencesPerFile * (i+1) < numberOfSentences):
+        if (numberSentencesPerFile * (i+1) < numberOfSentences):      
             file.write("".join(sentencesList[i * numberSentencesPerFile: (i + 1) * numberSentencesPerFile]))
         else:
             file.write("".join(sentencesList[i * numberSentencesPerFile:]))
